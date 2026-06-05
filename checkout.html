@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - nsmfy</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">
+                <img src="NSMFY LOGO illustratorAsset 1.svg" alt="nsmfy logo" class="logo-img">
+            </a>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search items..." id="search-input">
+                <button type="button" id="search-btn">Search</button>
+            </div>
+            
+            <div class="nav-menu">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="seller.html">Sell</a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="cart.html" class="cart-button" aria-label="Cart">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span id="cart-count" data-empty="true">0</span>
+                    </a>
+                    <button class="auth-button" id="auth-btn" onclick="location.href='login.html'">Sign In / Register</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Content -->
+    <main class="checkout-page-layout">
+        <!-- Main Form Grid (hidden on order success) -->
+        <div class="checkout-page-container" id="checkout-main-grid">
+            
+            <!-- Left Side: Shipping & Payment Forms -->
+            <div class="checkout-forms-section">
+                <h1>Secure Checkout</h1>
+                
+                <form id="checkout-form" onsubmit="handlePlaceOrder(event)">
+                    <!-- SECTION 1: Delivery Details -->
+                    <div class="checkout-form-card">
+                        <h2>1. Shipping Details</h2>
+                        <div class="checkout-form-grid">
+                            <div class="checkout-form-group full-width">
+                                <label for="ship-name">Full Name *</label>
+                                <input type="text" id="ship-name" placeholder="e.g. Sipho Nkosi" required>
+                            </div>
+                            
+                            <div class="checkout-form-group full-width">
+                                <label for="ship-address">Street Address *</label>
+                                <input type="text" id="ship-address" placeholder="e.g. 123 Main Road, Rondebosch" required>
+                            </div>
+                            
+                            <div class="checkout-form-group">
+                                <label for="ship-city">City *</label>
+                                <input type="text" id="ship-city" placeholder="e.g. Cape Town" required>
+                            </div>
+                            
+                            <div class="checkout-form-group">
+                                <label for="ship-province">Province *</label>
+                                <select id="ship-province" required>
+                                    <option value="">Select Province</option>
+                                    <option value="Gauteng">Gauteng</option>
+                                    <option value="Western Cape">Western Cape</option>
+                                    <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                                    <option value="Eastern Cape">Eastern Cape</option>
+                                    <option value="Free State">Free State</option>
+                                    <option value="Limpopo">Limpopo</option>
+                                    <option value="Mpumalanga">Mpumalanga</option>
+                                    <option value="North West">North West</option>
+                                    <option value="Northern Cape">Northern Cape</option>
+                                </select>
+                            </div>
+                            
+                            <div class="checkout-form-group">
+                                <label for="ship-postal">Postal Code *</label>
+                                <input type="text" id="ship-postal" placeholder="e.g. 7700" pattern="[0-9]{4}" title="Please enter a valid 4-digit South African postal code" required>
+                            </div>
+                            
+                            <div class="checkout-form-group">
+                                <label for="ship-phone">Phone Number *</label>
+                                <input type="tel" id="ship-phone" placeholder="e.g. 071 234 5678" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SECTION 2: Payment Method -->
+                    <div class="checkout-form-card">
+                        <h2>2. Payment Information</h2>
+                        
+                        <div class="payment-methods-selection">
+                            <label class="pay-method-option selected" id="method-card">
+                                <input type="radio" name="payment-method" value="card" checked onchange="togglePaymentFields('card')">
+                                <svg class="pay-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <span>Credit / Debit Card</span>
+                            </label>
+                            
+                            <label class="pay-method-option" id="method-eft">
+                                <input type="radio" name="payment-method" value="eft" onchange="togglePaymentFields('eft')">
+                                <svg class="pay-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                                <span>Instant EFT / Swap</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Credit Card Input Fields -->
+                        <div id="card-fields-section" class="checkout-form-grid" style="margin-top: 20px;">
+                            <div class="checkout-form-group full-width">
+                                <label for="card-num">Card Number *</label>
+                                <input type="text" id="card-num" placeholder="e.g. 4000 1234 5678 9010" pattern="[0-9\s]{13,19}" required>
+                            </div>
+                            
+                            <div class="checkout-form-group">
+                                <label for="card-expiry">Expiry Date *</label>
+                                <input type="text" id="card-expiry" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/[0-9]{2}" required>
+                            </div>
+                            
+                            <div class="checkout-form-group">
+                                <label for="card-cvv">CVV Code *</label>
+                                <input type="password" id="card-cvv" placeholder="e.g. 123" pattern="[0-9]{3}" required>
+                            </div>
+                        </div>
+                        
+                        <!-- EFT Instructions Block -->
+                        <div id="eft-fields-section" class="eft-instructions-block hidden" style="margin-top: 20px;">
+                            <strong>Mock Bank Transfer Details</strong>
+                            <p>Please transfer the total amount to the bank details below using your auto-generated order code as reference:</p>
+                            <ul>
+                                <li><strong>Bank:</strong> FNB Student Account</li>
+                                <li><strong>Account Name:</strong> nsmfy (PTY) LTD</li>
+                                <li><strong>Account Number:</strong> 62019283746</li>
+                                <li><strong>Branch Code:</strong> 250655</li>
+                            </ul>
+                            <p class="field-helper">Send proof of payment to swap-orders@nsmfy.co.za to speed up shipment verification.</p>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="place-order-btn">Place Order Securely</button>
+                </form>
+            </div>
+            
+            <!-- Right Side: Order Review Summary -->
+            <aside class="checkout-summary-sidebar">
+                <h2>Order Summary</h2>
+                <hr class="summary-divider">
+                
+                <div class="checkout-items-summary" id="checkout-items-list">
+                    <!-- List of items with small images, titles, quantity and total price -->
+                </div>
+                
+                <hr class="summary-divider">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="chk-subtotal">R0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span id="chk-shipping">R80</span>
+                </div>
+                <hr class="summary-divider">
+                <div class="summary-row total-row">
+                    <strong>Total Amount</strong>
+                    <strong id="chk-total">R0</strong>
+                </div>
+            </aside>
+        </div>
+        
+        <!-- SUCCESS SCREEN: Displayed after successful checkout -->
+        <div class="checkout-success-container hidden" id="order-success-screen">
+            <div class="success-wrap">
+                <div class="success-check-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h1>Order Placed Successfully!</h1>
+                <p class="success-subtitle">Thank you for supporting South Africa's student marketplace.</p>
+                
+                <div class="success-order-box">
+                    <p><strong>Order Code:</strong> <span id="order-code-display">NSM-1829-ZA</span></p>
+                    <p><strong>Estimated Delivery:</strong> 3-5 Business Days</p>
+                    <p>A verification email has been sent to your registered address with tracking information.</p>
+                </div>
+                
+                <button class="cta-button" onclick="location.href='index.html'">Return to Home</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="seller.html">Sell on nsmfy</a>
+                <a href="login.html">Sign In / Register</a>
+                <a href="admin.html">Admin</a>
+            </div>
+            <p>&copy; 2026 nsmfy &mdash; South Africa's Swap &amp; Buy Marketplace</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+    <script src="cart.js"></script>
+    <script>
+        // Redirect back to cart page if trying to checkout with empty or unauthenticated state
+        async function checkEmptyCart() {
+            try {
+                const session = await api.getSession();
+                if (!session.logged_in) {
+                    alert("Please sign in to complete your checkout.");
+                    location.href = 'login.html';
+                    return;
+                }
+                
+                const cart = await getCart();
+                if (cart.length === 0) {
+                    alert("Your cart is empty. Please add items to check out.");
+                    location.href = 'index.html';
+                }
+            } catch (err) {
+                console.error("Cart check error:", err);
+            }
+        }
+
+        // Render summary elements on checkout page
+        async function renderCheckoutSummary() {
+            try {
+                const cart = await getCart();
+                const listEl = document.getElementById('checkout-items-list');
+                
+                // Build the list items HTML
+                listEl.innerHTML = cart.map(item => `
+                    <div class="chk-item-row">
+                        <div class="chk-item-img-wrap">
+                            <img src="${item.image_path}" alt="${item.title}">
+                        </div>
+                        <div class="chk-item-meta">
+                            <h4>${item.title}</h4>
+                            <span>Qty: ${item.quantity} × R${parseFloat(item.price).toLocaleString('en-ZA')}</span>
+                        </div>
+                        <div class="chk-item-total">
+                            R${(parseFloat(item.price) * parseInt(item.quantity)).toLocaleString('en-ZA')}
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Calculate and display prices
+                const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
+                const shipping = subtotal > 2000 ? 0 : 80;
+                const total = subtotal + shipping;
+                
+                document.getElementById('chk-subtotal').textContent = `R${subtotal.toLocaleString('en-ZA')}`;
+                document.getElementById('chk-shipping').textContent = shipping === 0 ? 'FREE' : `R${shipping}`;
+                document.getElementById('chk-total').textContent = `R${total.toLocaleString('en-ZA')}`;
+                
+                window._orderSubtotal = subtotal;
+                window._orderShipping = shipping;
+                window._orderTotal = total;
+            } catch (err) {
+                console.error("Error rendering checkout summary:", err);
+            }
+        }
+
+        // Toggle form validation constraints depending on the chosen payment method
+        function togglePaymentFields(method) {
+            // Update visual styling of selected option
+            document.querySelectorAll('.pay-method-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById(`method-${method}`).classList.add('selected');
+            
+            const cardFields = document.getElementById('card-fields-section');
+            const eftFields = document.getElementById('eft-fields-section');
+            
+            const cardNumInput = document.getElementById('card-num');
+            const cardExpiryInput = document.getElementById('card-expiry');
+            const cardCvvInput = document.getElementById('card-cvv');
+            
+            if (method === 'card') {
+                cardFields.classList.remove('hidden');
+                eftFields.classList.add('hidden');
+                
+                // Make inputs required
+                cardNumInput.setAttribute('required', 'required');
+                cardExpiryInput.setAttribute('required', 'required');
+                cardCvvInput.setAttribute('required', 'required');
+            } else {
+                cardFields.classList.add('hidden');
+                eftFields.classList.remove('hidden');
+                
+                // Remove required flags
+                cardNumInput.removeAttribute('required');
+                cardExpiryInput.removeAttribute('required');
+                cardCvvInput.removeAttribute('required');
+            }
+        }
+
+        // Handle order placement form submission
+        async function handlePlaceOrder(event) {
+            event.preventDefault();
+
+            const btn = document.querySelector('.place-order-btn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+            
+            const ship_name     = document.getElementById('shipping-name').value.trim();
+            const ship_address  = document.getElementById('shipping-address').value.trim();
+            const ship_city     = document.getElementById('shipping-city').value.trim();
+            const ship_province = document.getElementById('shipping-province').value;
+            const ship_postal   = document.getElementById('shipping-postal').value.trim();
+            const ship_phone    = document.getElementById('shipping-phone').value.trim();
+            
+            const paymentMethodOption = document.querySelector('.pay-method-option.selected');
+            const payment_method = paymentMethodOption && paymentMethodOption.id === 'method-eft' ? 'eft' : 'card';
+            
+            const orderDetails = {
+                ship_name, ship_address, ship_city, ship_province, ship_postal, ship_phone,
+                payment_method,
+                subtotal: window._orderSubtotal || 0,
+                shipping_cost: window._orderShipping || 0,
+                total: window._orderTotal || 0
+            };
+
+            try {
+                const res = await api.placeOrder(orderDetails);
+
+                // --- Build Payfast Sandbox form ---
+                const baseUrl = window.location.origin + window.location.pathname.replace('checkout.html', '');
+
+                const pfData = {
+                    merchant_id:   '10000100',         // Payfast Sandbox Merchant ID
+                    merchant_key:  '46f0cd694581a',    // Payfast Sandbox Merchant Key
+                    return_url:    baseUrl + 'success.html?order=' + encodeURIComponent(res.order_code),
+                    cancel_url:    baseUrl + 'checkout.html',
+                    notify_url:    baseUrl + 'api/payfast_itn.php',
+                    m_payment_id:  res.order_code,     // Our order reference
+                    amount:        (window._orderTotal || 0).toFixed(2),
+                    item_name:     'nsmfy Marketplace Order - ' + res.order_code,
+                    item_description: 'Secure payment via nsmfy South Africa',
+                    email_address: '', // Will be filled by Payfast from session if blank
+                };
+
+                // Build and auto-submit form to Payfast Sandbox
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://sandbox.payfast.co.za/eng/process';
+
+                for (const [key, val] of Object.entries(pfData)) {
+                    const input = document.createElement('input');
+                    input.type  = 'hidden';
+                    input.name  = key;
+                    input.value = val;
+                    form.appendChild(input);
+                }
+
+                document.body.appendChild(form);
+                form.submit(); // Redirect to Payfast Sandbox!
+
+            } catch (err) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Place Order'; }
+                alert(err.message || 'Failed to place order. Please try again.');
+            }
+        }
+
+        // Initial setup on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkEmptyCart();
+            await renderCheckoutSummary();
+        });
+    </script>
+</body>
+</html>
+
+

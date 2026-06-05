@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nsmfy - Admin Console</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        
+        .admin-wrap {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .admin-page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+        .admin-page-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            color: #0f172a;
+        }
+        .admin-page-header span {
+            font-size: 13px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 4px 10px;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card p {
+            margin: 10px 0 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .submissions-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+        .submissions-box h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            color: #0f172a;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .doc-link {
+            color: #383fa3;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .doc-link:hover {
+            text-decoration: underline;
+        }
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-approve { background-color: #10b981; color: #ffffff; }
+        .btn-reject  { background-color: #ef4444; color: #ffffff; }
+        .status-badge {
+            font-weight: 600;
+            font-size: 12px;
+            padding: 4px 8px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .status-approved { background-color: #dcfce7; color: #15803d; }
+        .status-rejected { background-color: #fee2e2; color: #b91c1c; }
+        .no-data {
+            text-align: center;
+            color: #64748b;
+            padding: 40px 0;
+            font-size: 14px;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <!-- Site Navigation -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">
+                <img src="NSMFY LOGO illustratorAsset 1.svg" alt="nsmfy logo" class="logo-img">
+            </a>
+            <div class="nav-menu">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="seller.html">Sell</a>
+                    <a href="admin.html" class="active">Admin</a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="login.html" class="auth-button" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">Sign Out</a>
+                </div>
+            </div>
+        </div>
+    </h    <!-- Admin Content -->
+    <div class="admin-wrap">
+        <!-- Header -->
+        <header class="admin-page-header">
+            <h1>nsmfy Admin Portal</h1>
+            <span>Admin Access Only</span>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Pending Seller Reviews</h3>
+                <p id="pending-count">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Verified Sellers</h3>
+                <p id="verified-count">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Listings</h3>
+                <p id="active-listings-count">0</p>
+            </div>
+        </div>
+
+        <!-- Submissions Panel -->
+        <div class="submissions-box">
+            <h2>Pending Seller Identity Verifications</h2>
+            <p style="color:#64748b;font-size:13px;margin-bottom:16px;">Sellers below have completed phone verification (OTP) and submitted their ID documents. Review and approve or reject each application.</p>
+            <table id="submissions-table">
+                <thead>
+                    <tr>
+                        <th>Seller Name</th>
+                        <th>Phone (Verified)</th>
+                        <th>SA ID Number</th>
+                        <th>ID Document</th>
+                        <th>Date Submitted</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="submissions-body">
+                    <!-- Dynamic Content -->
+                </tbody>
+            </table>
+            <div id="no-data-msg" class="no-data hidden">
+                No pending seller verifications remaining.
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="seller.html">Sell on nsmfy</a>
+                <a href="login.html">Sign In / Register</a>
+                <a href="admin.html">Admin</a>
+            </div>
+            <p>&copy; 2026 nsmfy &mdash; South Africa's Swap &amp; Buy Marketplace</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadAdminDashboard() {
+            try {
+                const data = await api.getAdminDashboard();
+                
+                const pendingCount = data.pending_sellers ? data.pending_sellers.length : 0;
+                document.getElementById('pending-count').textContent = pendingCount;
+                document.getElementById('verified-count').textContent = data.stats.approved_sellers || 0;
+                document.getElementById('active-listings-count').textContent = data.stats.active_listings || 0;
+
+                const tbody = document.getElementById('submissions-body');
+                const noDataMsg = document.getElementById('no-data-msg');
+
+                if (pendingCount === 0) {
+                    tbody.innerHTML = '';
+                    document.getElementById('submissions-table').style.display = 'none';
+                    noDataMsg.classList.remove('hidden');
+                } else {
+                    document.getElementById('submissions-table').style.display = 'table';
+                    noDataMsg.classList.add('hidden');
+                    tbody.innerHTML = data.pending_sellers.map(seller => `
+                        <tr id="row-${seller.id}">
+                            <td><strong>${seller.full_name}</strong><br><span style="color:#64748b;font-size:12px;">${seller.email}</span></td>
+                            <td><span style="color:#10b981;font-weight:600;">✔</span> ${seller.phone}</td>
+                            <td style="font-family:monospace;">${seller.sa_id_number}</td>
+                            <td>
+                                <a href="${seller.id_doc_path}" target="_blank" class="doc-link">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                    View ID Document
+                                </a>
+                            </td>
+                            <td>${new Date(seller.created_at).toLocaleDateString()}</td>
+                            <td id="status-cell-${seller.id}">
+                                <div class="actions-cell">
+                                    <button class="btn btn-approve" onclick="resolveReview(${seller.id}, 'approve')">Approve</button>
+                                    <button class="btn btn-reject" onclick="resolveReview(${seller.id}, 'reject')">Reject</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error("Failed to load admin dashboard", err);
+            }
+        }
+
+        async function resolveReview(sellerId, action) {
+            try {
+                if (action === 'approve') {
+                    await api.approveSeller(sellerId);
+                } else {
+                    await api.rejectSeller(sellerId);
+                }
+                
+                // Update UI instantly
+                const statusCell = document.getElementById(`status-cell-${sellerId}`);
+                if (action === 'approve') {
+                    statusCell.innerHTML = `<span class="status-badge status-approved">Approved</span>`;
+                } else {
+                    statusCell.innerHTML = `<span class="status-badge status-rejected">Rejected</span>`;
+                }
+
+                // Refresh the whole dashboard to update counts after 1.5s
+                setTimeout(() => loadAdminDashboard(), 1500);
+
+            } catch (err) {
+                alert(err.message || "Action failed");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAdminDashboard();
+        });
+    </script>
+    <script src="api.js"></script>
+    <script src="cart.js"></script>
+</body>
+</html>
+
+

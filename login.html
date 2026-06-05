@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Access - nsmfy</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Site Navigation -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">
+                <img src="NSMFY LOGO illustratorAsset 1.svg" alt="nsmfy logo" class="logo-img">
+            </a>
+            <div class="search-bar">
+                <input type="text" placeholder="Search items..." id="search-input" onkeydown="if(event.key==='Enter') location.href='products.html'">
+                <button type="button" id="search-btn" onclick="location.href='products.html'">Search</button>
+            </div>
+            <div class="nav-menu">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="seller.html">Sell</a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="cart.html" class="cart-button" aria-label="Cart">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span id="cart-count" data-empty="true">0</span>
+                    </a>
+                    <button class="auth-button active" id="auth-btn" onclick="location.href='login.html'">Sign In / Register</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Auth Page Content -->
+    <div class="auth-page-outer">
+        
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+                <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form" onsubmit="handleAuthSubmit(event, 'login')">
+                <h2>Welcome Back</h2>
+                <p class="auth-subtitle">Access South Africa's Swap & Buy Marketplace</p>
+
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="you@domain.co.za" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required />
+                </div>
+
+                <button type="submit" class="auth-submit-btn">Sign In</button>
+            </form>
+
+            <!-- Registration Form -->
+            <form id="register-form" class="auth-form hidden" onsubmit="handleAuthSubmit(event, 'register')">
+                <h2>Create Account</h2>
+                <p class="auth-subtitle">Join thousands trading across South Africa</p>
+
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" placeholder="e.g. Sipho Nkosi" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" placeholder="you@domain.co.za" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-phone">Phone Number *</label>
+                    <input type="tel" id="reg-phone" placeholder="e.g. 071 234 5678" required />
+                    <p class="field-helper">Used for SMS verification to keep your account secure.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" placeholder="Min. 8 characters" required />
+                </div>
+
+                <!-- Role Selection Cards -->
+                <div class="form-group">
+                    <label>I want to join as:</label>
+                    <div class="role-selection">
+                        <label class="role-card selected" id="card-buyer">
+                            <input type="radio" name="role" value="buyer" checked onchange="toggleRoleFields('buyer')">
+                            <svg class="role-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>
+                            <span>Buyer</span>
+                        </label>
+                        <label class="role-card" id="card-seller">
+                            <input type="radio" name="role" value="seller" onchange="toggleRoleFields('seller')">
+                            <svg class="role-icon" viewBox="0 0 24 24"><path d="M20.38 3.46L16 7.84M2 22l4.38-4.38M16 3.46l4.38 4.38M12.38 12L7 17.38M20.38 20.38L16 16M2 2l4.38 4.38"></path></svg>
+                            <span>Seller</span>
+                        </label>
+                        <label class="role-card" id="card-admin">
+                            <input type="radio" name="role" value="admin" onchange="toggleRoleFields('admin')">
+                            <svg class="role-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <span>Admin</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Seller Verification Fields (Shown only for Sellers) -->
+                <div id="seller-upload-section" class="form-group hidden">
+                    <label>Seller Identity Verification</label>
+                    <p class="field-helper">To protect buyers, all sellers must verify their identity before trading. This is reviewed by our admin team.</p>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="reg-sa-id">South African ID Number *</label>
+                        <input type="text" id="reg-sa-id" placeholder="13-digit SA ID number" maxlength="13" />
+                        <p class="field-helper">Your ID number is used for identity verification only and kept private.</p>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <label>Upload ID Document or Passport</label>
+                        <p class="field-helper">PDF, PNG, or JPG (max. 5MB)</p>
+                        <div class="upload-container" onclick="document.getElementById('id-doc-input').click()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path></svg>
+                            <p id="upload-text">Click to upload South African ID or Passport</p>
+                            <span>PDF, PNG, or JPG (max. 5MB)</span>
+                            <input type="file" id="id-doc-input" class="hidden" accept=".pdf,.png,.jpg,.jpeg" onchange="handleFileSelected(event)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Access Key (Shown only for Admin role selection) -->
+                <div id="admin-key-section" class="form-group hidden">
+                    <label for="admin-code">Admin Security Verification Key</label>
+                    <input type="password" id="admin-code" placeholder="Enter system security access code" />
+                </div>
+
+                <button type="submit" class="auth-submit-btn" id="create-account-btn">Create Account</button>
+            </form>
+
+            <!-- Success Screen -->
+            <div id="success-screen" class="auth-form hidden text-center">
+                <div class="success-icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h2 id="success-title">Account Created!</h2>
+                <p id="success-message" class="auth-subtitle">Thank you for registering. You can now access the marketplace.</p>
+                <button class="auth-submit-btn" id="success-action-btn" onclick="handleSuccessAction()">Go to Home</button>
+            </div>
+    </div>
+    </div><!-- /auth-page-outer -->
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="seller.html">Sell on nsmfy</a>
+                <a href="login.html">Sign In / Register</a>
+                <a href="admin.html">Admin</a>
+            </div>
+            <p>&copy; 2026 nsmfy &mdash; South Africa's Swap &amp; Buy Marketplace</p>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(mode) {
+            const loginTab = document.getElementById('tab-login');
+            const registerTab = document.getElementById('tab-register');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const successScreen = document.getElementById('success-screen');
+
+            successScreen.classList.add('hidden');
+
+            if (mode === 'login') {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        function toggleRoleFields(role) {
+            // Update selected card styling
+            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+            document.getElementById(`card-${role}`).classList.add('selected');
+
+            const uploadSection = document.getElementById('seller-upload-section');
+            const adminSection = document.getElementById('admin-key-section');
+            const idInput = document.getElementById('id-doc-input');
+            const adminInput = document.getElementById('admin-code');
+
+            if (role === 'seller') {
+                uploadSection.classList.remove('hidden');
+                idInput.setAttribute('required', 'required');
+                adminSection.classList.add('hidden');
+                adminInput.removeAttribute('required');
+            } else if (role === 'admin') {
+                uploadSection.classList.add('hidden');
+                idInput.removeAttribute('required');
+                adminSection.classList.remove('hidden');
+                adminInput.setAttribute('required', 'required');
+            } else {
+                uploadSection.classList.add('hidden');
+                idInput.removeAttribute('required');
+                adminSection.classList.add('hidden');
+                adminInput.removeAttribute('required');
+            }
+        }
+
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            const textElement = document.getElementById('upload-text');
+            if (file) {
+                textElement.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                textElement.style.color = '#383fa3';
+                textElement.style.fontWeight = '600';
+            }
+        }
+
+        let _successRole = 'buyer';
+        let _successFormType = 'login';
+
+        function handleSuccessAction() {
+            if (_successFormType === 'login' || _successRole === 'buyer') {
+                location.href = 'index.html';
+            } else if (_successRole === 'seller') {
+                location.href = 'seller.html';
+            } else if (_successRole === 'admin') {
+                location.href = 'admin.html';
+            }
+        }
+
+        async function handleAuthSubmit(event, formType) {
+            event.preventDefault();
+            _successFormType = formType;
+
+            if (formType === 'login') {
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+
+                try {
+                    const res = await api.login(email, password);
+                    _successRole = res.user.role;
+                    completeRegistration(res.user.role);
+                } catch (err) {
+                    alert(err.message || 'Login failed. Please check your credentials.');
+                }
+            } else {
+                const name = document.getElementById('reg-name').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                const phone = document.getElementById('reg-phone').value.trim();
+                const password = document.getElementById('reg-password').value;
+                const role = document.querySelector('input[name="role"]:checked').value;
+
+                // Prepare FormData for registration
+                const formData = new FormData();
+                formData.append('action', 'register');
+                formData.append('full_name', name);
+                formData.append('email', email);
+                formData.append('phone', phone);
+                formData.append('password', password);
+                formData.append('role', role);
+
+                if (role === 'seller') {
+                    const saId = document.getElementById('reg-sa-id').value.trim();
+                    const idDocInput = document.getElementById('id-doc-input');
+                    const file = idDocInput.files[0];
+
+                    if (!saId || saId.length !== 13) {
+                        alert('Please enter a valid 13-digit SA ID number.');
+                        return;
+                    }
+                    if (!file) {
+                        alert('Please upload your ID document or passport.');
+                        return;
+                    }
+                    formData.append('sa_id_number', saId);
+                    formData.append('id_doc', file);
+
+                    // OTP verification dialog first
+                    openOtpModal(phone, async () => {
+                        try {
+                            const res = await api.register(formData);
+                            _successRole = role;
+                            completeRegistration(role);
+                        } catch (err) {
+                            alert(err.message || 'Registration failed.');
+                        }
+                    });
+                    return;
+                }
+
+                if (role === 'admin') {
+                    const adminCode = document.getElementById('admin-code').value;
+                    if (!adminCode) {
+                        alert('Please enter the Admin Security Verification Key.');
+                        return;
+                    }
+                    formData.append('admin_code', adminCode);
+                }
+
+                try {
+                    const res = await api.register(formData);
+                    _successRole = role;
+                    completeRegistration(role);
+                } catch (err) {
+                    alert(err.message || 'Registration failed.');
+                }
+            }
+        }
+
+        function completeRegistration(selectedRole) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const successScreen = document.getElementById('success-screen');
+            const successTitle = document.getElementById('success-title');
+            const successMessage = document.getElementById('success-message');
+
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            successScreen.classList.remove('hidden');
+
+            if (_successFormType === 'login') {
+                successTitle.textContent = "Signed In Successfully";
+                successMessage.textContent = `Welcome back! Redirecting you to the platform...`;
+                document.getElementById('success-action-btn').textContent = 'Continue';
+            } else {
+                if (selectedRole === 'seller') {
+                    successTitle.textContent = "Application Submitted!";
+                    successMessage.textContent = "Phone verified! Your seller registration and SA ID document are now under admin review. Once approved, you can start trading.";
+                    document.getElementById('success-action-btn').textContent = 'Go to Seller Dashboard';
+                } else if (selectedRole === 'admin') {
+                    successTitle.textContent = "Admin Access Verified";
+                    successMessage.textContent = "You have been granted admin access. Click below to open the Admin Console.";
+                    document.getElementById('success-action-btn').textContent = 'Open Admin Console';
+                } else {
+                    successTitle.textContent = "Registration Complete!";
+                    successMessage.textContent = "Welcome! Your buyer profile is now active on the nsmfy marketplace.";
+                    document.getElementById('success-action-btn').textContent = 'Go to Home';
+                }
+            }
+        }
+    </script>
+    <script src="api.js"></script>
+    <script src="cart.js"></script>
+    <script src="marketplace.js"></script>
+</body>
+</html>

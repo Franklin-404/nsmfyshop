@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - nsmfy</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">
+                <img src="NSMFY LOGO illustratorAsset 1.svg" alt="nsmfy logo" class="logo-img">
+            </a>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search items..." id="search-input">
+                <button type="button" id="search-btn">Search</button>
+            </div>
+            
+            <div class="nav-menu">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="seller.html">Sell</a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="cart.html" class="cart-button active" aria-label="Cart">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span id="cart-count" data-empty="true">0</span>
+                    </a>
+                    <button class="auth-button" id="auth-btn" onclick="location.href='login.html'">Sign In / Register</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Layout -->
+    <main class="cart-page-layout">
+        <div class="cart-page-container">
+            <!-- Left Side: Cart Items List -->
+            <div class="cart-items-section">
+                <h1>Your Shopping Cart</h1>
+                
+                <div id="cart-items-container">
+                    <!-- Items will be generated dynamically by JavaScript -->
+                </div>
+                
+                <!-- Empty State Message (shown when cart is empty) -->
+                <div id="empty-cart-msg" class="cart-empty-state hidden">
+                    <div class="empty-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    </div>
+                    <h3>Your cart is empty</h3>
+                    <p>Looks like you haven't added anything to your cart yet. Explore our student marketplace to find great swap deals!</p>
+                    <button class="cta-button" onclick="location.href='products.html'">Browse Products</button>
+                </div>
+            </div>
+
+            <!-- Right Side: Order Summary Card -->
+            <aside class="cart-summary-sidebar" id="cart-summary-card">
+                <h2>Order Summary</h2>
+                <hr class="summary-divider">
+                
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal-amount">R0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Estimated Shipping / Swap Delivery</span>
+                    <span id="shipping-amount">R80</span>
+                </div>
+                <hr class="summary-divider">
+                
+                <div class="summary-row total-row">
+                    <strong>Total</strong>
+                    <strong id="total-amount">R0</strong>
+                </div>
+                
+                <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
+                <button class="clear-cart-btn" onclick="clearWholeCart()">Clear Entire Cart</button>
+                
+                <p class="summary-footer-text">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Secure Swap Guarantee: Inspect items before finalizing payments or trades.
+                </p>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="seller.html">Sell on nsmfy</a>
+                <a href="login.html">Sign In / Register</a>
+                <a href="admin.html">Admin</a>
+            </div>
+            <p>&copy; 2026 nsmfy &mdash; South Africa's Swap &amp; Buy Marketplace</p>
+        </div>
+    </footer>
+
+    <!-- Cart Scripts -->
+    <script src="api.js"></script>
+    <script src="cart.js"></script>
+    <script>
+        // Render the cart items on the page
+        async function renderCart() {
+            const cart = await getCart();
+            const itemsContainer = document.getElementById('cart-items-container');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const summaryCard = document.getElementById('cart-summary-card');
+            
+            // If the cart is empty, show empty state message and hide order summary
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '';
+                emptyMsg.classList.remove('hidden');
+                summaryCard.classList.add('hidden');
+                return;
+            }
+            
+            // Otherwise, hide empty state and show summary card
+            emptyMsg.classList.add('hidden');
+            summaryCard.classList.remove('hidden');
+            
+            // Generate HTML for each item in the cart array
+            itemsContainer.innerHTML = cart.map(item => `
+                <div class="cart-item-card">
+                    <div class="cart-item-img-wrapper">
+                        <img src="${item.image_path}" alt="${item.title}">
+                    </div>
+                    <div class="cart-item-details">
+                        <h3>${item.title}</h3>
+                        <p class="cart-item-price">R${parseFloat(item.price).toLocaleString('en-ZA')}</p>
+                    </div>
+                    <div class="cart-item-quantity-controls">
+                        <button class="qty-btn btn-minus" onclick="adjustItemQuantity(${item.product_id}, -1, ${item.quantity})">−</button>
+                        <span class="qty-display">${item.quantity}</span>
+                        <button class="qty-btn btn-plus" onclick="adjustItemQuantity(${item.product_id}, 1, ${item.quantity})">+</button>
+                    </div>
+                    <div class="cart-item-subtotal">
+                        <p>R${(parseFloat(item.price) * parseInt(item.quantity)).toLocaleString('en-ZA')}</p>
+                    </div>
+                    <button class="remove-item-btn" aria-label="Remove item" onclick="removeSingleItem(${item.product_id}, '${item.title.replace(/'/g, "\\'")}')">
+                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                </div>
+            `).join('');
+            
+            // Update prices
+            calculateTotals(cart);
+        }
+
+        // Adjust quantity of a single product item
+        async function adjustItemQuantity(productId, amount, currentQty) {
+            const newQty = parseInt(currentQty) + amount;
+            try {
+                await api.updateCartQuantity(productId, newQty);
+                await updateCartCount();
+                await renderCart();
+            } catch (err) {
+                console.error("Error adjusting item quantity:", err);
+                showToastNotification("Failed to update quantity.");
+            }
+        }
+
+        // Remove a single item from the cart
+        async function removeSingleItem(productId, title) {
+            try {
+                await api.removeFromCart(productId);
+                await updateCartCount();
+                await renderCart();
+                showToastNotification(`Removed "${title}" from cart.`);
+            } catch (err) {
+                console.error("Error removing item:", err);
+                showToastNotification("Failed to remove item.");
+            }
+        }
+
+        // Clear the entire cart
+        async function clearWholeCart() {
+            if (confirm("Are you sure you want to empty your shopping cart?")) {
+                try {
+                    await api.clearCart();
+                    await updateCartCount();
+                    await renderCart();
+                    showToastNotification("Cleared all items from your cart.");
+                } catch (err) {
+                    console.error("Error clearing cart:", err);
+                    showToastNotification("Failed to clear cart.");
+                }
+            }
+        }
+
+        // Calculate and display Subtotal, Shipping, and Grand Total
+        function calculateTotals(cart) {
+            // Calculate subtotal
+            const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
+            
+            // Shipping cost (flat rate R80, or free if subtotal is over R2000!)
+            const shipping = subtotal > 2000 ? 0 : 80;
+            
+            const total = subtotal + shipping;
+            
+            // Render to DOM
+            document.getElementById('subtotal-amount').textContent = `R${subtotal.toLocaleString('en-ZA')}`;
+            document.getElementById('shipping-amount').textContent = shipping === 0 ? 'FREE' : `R${shipping}`;
+            document.getElementById('total-amount').textContent = `R${total.toLocaleString('en-ZA')}`;
+        }
+
+        // Navigate to the checkout page
+        function goToCheckout() {
+            location.href = 'checkout.html';
+        }
+
+        // Initial render on load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+        });
+    </script>
+</body>
+</html>
+
+
